@@ -42,15 +42,17 @@ export function run(program: string): State {
     const parts = trimmed.replace(/,/g, " ").split(/\s+/).filter(Boolean);
     const opcode = parts[0];
 
-    if (opcode !== "mov") {
+    if (opcode !== "mov" && opcode !== "add" && opcode !== "sub") {
       console.log(`unknown instruction: ${opcode}`);
       state.status = "errored";
       printState(state);
       return state;
     }
 
+    const missingOpMsg = `missing operand for ${opcode}`;
+
     if (parts.length < 3) {
-      console.log("missing operand for mov");
+      console.log(missingOpMsg);
       state.status = "errored";
       printState(state);
       return state;
@@ -66,9 +68,9 @@ export function run(program: string): State {
 
     const src = parts[2]!;
 
+    let srcVal: number;
     if (isRegister(src)) {
-      state.registers[dest as keyof typeof state.registers] =
-        state.registers[src as keyof typeof state.registers];
+      srcVal = state.registers[src as keyof typeof state.registers];
     } else {
       const num = Number(src);
       if (isNaN(num)) {
@@ -77,7 +79,15 @@ export function run(program: string): State {
         printState(state);
         return state;
       }
-      state.registers[dest as keyof typeof state.registers] = num;
+      srcVal = num;
+    }
+
+    if (opcode === "mov") {
+      state.registers[dest as keyof typeof state.registers] = srcVal;
+    } else if (opcode === "add") {
+      state.registers[dest as keyof typeof state.registers] += srcVal;
+    } else if (opcode === "sub") {
+      state.registers[dest as keyof typeof state.registers] -= srcVal;
     }
 
     printState(state);

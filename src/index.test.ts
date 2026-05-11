@@ -63,3 +63,12 @@ describe("mov instruction", () => {
     expect(result.status).toBe("finished");
   });
 });
+
+describe("add instruction", () => {
+  test("add with register source", () => {
+    const result = run("mov r0, 10\nmov r1, 20\nadd r0, r1");
+    expect(result.registers.r0).toBe(30);
+    expect(result.registers.r1).toBe(20);
+    expect(result.status).toBe("finished");
+  });
+});
