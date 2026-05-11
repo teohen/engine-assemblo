@@ -21,6 +21,7 @@ function printState(state: State): void {
   console.log(`messages: [${state.messages.join(", ")}]`);
 }
 
+const validOpcodes = new Set(["mov", "add", "sub"]);
 const validRegisters = new Set(["r0", "r1", "r2", "r3"]);
 
 function isRegister(s: string): boolean {
@@ -42,17 +43,19 @@ export function run(program: string): State {
     const parts = trimmed.replace(/,/g, " ").split(/\s+/).filter(Boolean);
     const opcode = parts[0];
 
-    if (opcode !== "mov" && opcode !== "add" && opcode !== "sub") {
-      console.log(`unknown instruction: ${opcode}`);
+    if (!validOpcodes.has(opcode)) {
+      const msg = `unknown instruction: ${opcode}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
     }
 
-    const missingOpMsg = `missing operand for ${opcode}`;
-
     if (parts.length < 3) {
-      console.log(missingOpMsg);
+      const msg = `missing operand for ${opcode}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
@@ -60,7 +63,9 @@ export function run(program: string): State {
 
     const dest = parts[1]!;
     if (!isRegister(dest)) {
-      console.log(`invalid register: ${dest}`);
+      const msg = `invalid register: ${dest}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
@@ -72,14 +77,18 @@ export function run(program: string): State {
     if (isRegister(src)) {
       srcVal = state.registers[src as keyof typeof state.registers];
     } else if (/^r\d+$/.test(src)) {
-      console.log(`invalid register: ${src}`);
+      const msg = `invalid register: ${src}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
     } else {
       const num = Number(src);
       if (isNaN(num)) {
-        console.log(`invalid value: ${src}`);
+        const msg = `invalid value: ${src}`;
+        console.log(msg);
+        state.messages.push(msg);
         state.status = "errored";
         printState(state);
         return state;

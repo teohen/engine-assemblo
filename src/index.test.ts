@@ -29,26 +29,26 @@ describe("mov instruction", () => {
   test("unknown opcode halts with error", () => {
     const result = run("xyz r0, 1");
     expect(result.status).toBe("errored");
-    expect(result.messages).toEqual([]);
+    expect(result.messages).toEqual(["unknown instruction: xyz"]);
     expect(result.registers.r0).toBe(0);
   });
 
   test("missing operand halts with error", () => {
     const result = run("mov r0");
     expect(result.status).toBe("errored");
-    expect(result.messages).toEqual([]);
+    expect(result.messages).toEqual(["missing operand for mov"]);
   });
 
   test("invalid register halts with error", () => {
     const result = run("mov r5, 10");
     expect(result.status).toBe("errored");
-    expect(result.messages).toEqual([]);
+    expect(result.messages).toEqual(["invalid register: r5"]);
   });
 
   test("non-numeric literal halts with error", () => {
     const result = run("mov r0, abc");
     expect(result.status).toBe("errored");
-    expect(result.messages).toEqual([]);
+    expect(result.messages).toEqual(["invalid value: abc"]);
   });
 
   test("empty lines are skipped", () => {
