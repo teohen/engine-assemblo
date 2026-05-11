@@ -21,6 +21,7 @@ function printState(state: State): void {
   console.log(`messages: [${state.messages.join(", ")}]`);
 }
 
+const validOpcodes = new Set(["mov", "add", "sub"]);
 const validRegisters = new Set(["r0", "r1", "r2", "r3"]);
 
 function isRegister(s: string): boolean {
@@ -42,15 +43,19 @@ export function run(program: string): State {
     const parts = trimmed.replace(/,/g, " ").split(/\s+/).filter(Boolean);
     const opcode = parts[0];
 
-    if (opcode !== "mov") {
-      console.log(`unknown instruction: ${opcode}`);
+    if (!validOpcodes.has(opcode)) {
+      const msg = `unknown instruction: ${opcode}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
     }
 
     if (parts.length < 3) {
-      console.log("missing operand for mov");
+      const msg = `missing operand for ${opcode}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
@@ -58,7 +63,9 @@ export function run(program: string): State {
 
     const dest = parts[1]!;
     if (!isRegister(dest)) {
-      console.log(`invalid register: ${dest}`);
+      const msg = `invalid register: ${dest}`;
+      console.log(msg);
+      state.messages.push(msg);
       state.status = "errored";
       printState(state);
       return state;
@@ -66,18 +73,28 @@ export function run(program: string): State {
 
     const src = parts[2]!;
 
+    let srcVal: number;
     if (isRegister(src)) {
-      state.registers[dest as keyof typeof state.registers] =
-        state.registers[src as keyof typeof state.registers];
+      srcVal = state.registers[src as keyof typeof state.registers];
     } else {
       const num = Number(src);
       if (isNaN(num)) {
-        console.log(`invalid value: ${src}`);
+        const msg = `invalid value: ${src}`;
+        console.log(msg);
+        state.messages.push(msg);
         state.status = "errored";
         printState(state);
         return state;
       }
-      state.registers[dest as keyof typeof state.registers] = num;
+      srcVal = num;
+    }
+
+    if (opcode === "mov") {
+      state.registers[dest as keyof typeof state.registers] = srcVal;
+    } else if (opcode === "add") {
+      state.registers[dest as keyof typeof state.registers] += srcVal;
+    } else if (opcode === "sub") {
+      state.registers[dest as keyof typeof state.registers] -= srcVal;
     }
 
     printState(state);

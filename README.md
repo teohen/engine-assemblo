@@ -21,12 +21,18 @@ Assemblo is a teaching tool. It simulates a minimal CPU in software so you can e
 |--------|--------------------|----------------------------------|
 | `mov`  | `rd, literal`      | Load numeric literal into register |
 | `mov`  | `rd, rs`           | Copy value from register to register |
+| `add`  | `rd, literal`      | Add literal to register           |
+| `add`  | `rd, rs`           | Add register value to register    |
+| `sub`  | `rd, literal`      | Subtract literal from register    |
+| `sub`  | `rd, rs`           | Subtract register value from register |
 
 ## Example
 
 ```
 mov r0, 10
 mov r1, 20
+add r0, r1
+sub r0, 5
 ```
 
 ## Usage
