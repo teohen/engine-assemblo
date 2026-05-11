@@ -76,13 +76,6 @@ export function run(program: string): State {
     let srcVal: number;
     if (isRegister(src)) {
       srcVal = state.registers[src as keyof typeof state.registers];
-    } else if (/^r\d+$/.test(src)) {
-      const msg = `invalid register: ${src}`;
-      console.log(msg);
-      state.messages.push(msg);
-      state.status = "errored";
-      printState(state);
-      return state;
     } else {
       const num = Number(src);
       if (isNaN(num)) {
