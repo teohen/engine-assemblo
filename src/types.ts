@@ -14,10 +14,12 @@ export function createState(): State {
   };
 }
 
-export const validRegisters = new Set(["r0", "r1", "r2", "r3"]);
+export type RegisterKey = "r0" | "r1" | "r2" | "r3";
 
-export function isRegister(s: string): boolean {
-  return validRegisters.has(s);
+export const validRegisters = new Set<RegisterKey>(["r0", "r1", "r2", "r3"]);
+
+export function isRegister(s: string): s is RegisterKey {
+  return validRegisters.has(s as RegisterKey);
 }
 
 export interface ParsedLine {
@@ -26,4 +28,4 @@ export interface ParsedLine {
   src: string | undefined;
 }
 
-export type InstructionHandler = (state: State, dest: string, srcVal: number) => void;
+export type InstructionHandler = (state: State, dest: RegisterKey, srcVal: number) => void;

@@ -1,5 +1,5 @@
-import type { State } from "../types";
+import type { RegisterKey, State } from "../types";
 
-export function mov(state: State, dest: string, srcVal: number): void {
-  state.registers[dest as keyof typeof state.registers] = srcVal;
+export function mov(state: State, dest: RegisterKey, srcVal: number): void {
+  state.registers[dest] = srcVal;
 }

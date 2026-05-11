@@ -3,7 +3,6 @@ import { createState, isRegister } from "./types";
 import { parseLine } from "./parser";
 import { halt } from "./errors";
 import { instructionHandlers } from "./instructions/index";
-import { printState } from "./io";
 
 export function run(program: string): State {
   const state = createState();
@@ -21,37 +20,31 @@ export function run(program: string): State {
 
     const handler = instructionHandlers[opcode];
     if (!handler) {
-      printState(halt(state, `unknown instruction: ${opcode}`));
-      return state;
+      return halt(state, `unknown instruction: ${opcode}`);
     }
 
     if (dest === undefined || src === undefined) {
-      printState(halt(state, `missing operand for ${opcode}`));
-      return state;
+      return halt(state, `missing operand for ${opcode}`);
     }
 
     if (!isRegister(dest)) {
-      printState(halt(state, `invalid register: ${dest}`));
-      return state;
+      return halt(state, `invalid register: ${dest}`);
     }
 
     let srcVal: number;
     if (isRegister(src)) {
-      srcVal = state.registers[src as keyof typeof state.registers];
+      srcVal = state.registers[src];
     } else {
       const num = Number(src);
       if (isNaN(num)) {
-        printState(halt(state, `invalid value: ${src}`));
-        return state;
+        return halt(state, `invalid value: ${src}`);
       }
       srcVal = num;
     }
 
     handler(state, dest, srcVal);
-    printState(state);
   }
 
   state.status = "finished";
-  printState(state);
   return state;
 }
