@@ -38,7 +38,44 @@ sub r0, 5
 ## Usage
 
 ```bash
-bun run src/index.ts
+bun run src/cli.ts
 ```
 
-Edit the program string in the source file to change what runs. No setup, no install steps beyond the runtime.
+Edit the program string in `src/cli.ts` to change what runs. No setup, no install steps beyond the runtime.
+
+```bash
+bun test        # run tests
+bun run lint    # lint source
+```
+
+## Project Structure
+
+```
+src/
+  types.ts         Domain types (State, ParsedLine, InstructionHandler)
+                   and utilities (createState, isRegister, validRegisters)
+
+  parser.ts        Pure function: line of text to structured representation.
+                   Knows nothing about State or execution.
+
+  errors.ts        Single halt() function. Centralizes the error flow
+                   (push message, set status to errored). No I/O.
+
+  io.ts            All console.log calls. printState() isolates I/O
+                   from business logic.
+
+  instructions/    One file per opcode, each as an isolated handler
+    mov.ts         mov rd, src
+    add.ts         add rd, src
+    sub.ts         sub rd, src
+    index.ts       Registry mapping opcode strings to handlers.
+                   Add a new instruction here without touching runner code.
+
+  runner.ts        run(program) orchestrator. Parses, validates,
+                   dispatches to handlers, prints state.
+
+  cli.ts           CLI entry point (import.meta.main). Edit the program
+                   string here.
+
+  index.ts         Public API re-exports. Tests import { run } from this.
+```
